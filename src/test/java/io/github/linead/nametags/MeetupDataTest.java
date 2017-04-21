@@ -43,6 +43,6 @@ public class MeetupDataTest {
     public void retrievedEventHaveValidDuration() {
         Event[] events = meetupData.getNextMeetups();
 
-        assertThat(asList(events), everyItem(hasProperty("duration", greaterThan(0L))));
+        assertThat(asList(events), everyItem(hasProperty("duration")));
     }
 }
