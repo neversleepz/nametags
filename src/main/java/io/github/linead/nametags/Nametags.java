@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Stream;
 
 
 @SpringBootApplication
@@ -50,8 +51,10 @@ public class Nametags extends SpringBootServletInitializer implements CommandLin
 
         List<Attendee> attendees = new ArrayList<>();
 
-        Event event = Arrays.asList(meetup.getNextMeetups())
-                .stream().filter(e -> eventId.equals(e.getId())).findFirst().get();
+        Event event = Stream.of(meetup.getNextMeetups())
+                .filter(e -> eventId.equals(e.getId()))
+                .findFirst()
+                .get();
 
         //fetch member info
         Map<String, Members.Member> members = meetup.getMembers(event.getGroup().getId());
