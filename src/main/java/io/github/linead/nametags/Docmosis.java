@@ -14,7 +14,7 @@ import java.util.Map;
 @Component
 public class Docmosis {
 
-    @Value("${docmosis-api.renderurl}")
+    @Value("${docmosis-api.renderUrl}")
     private String host;
 
     @Value("${docmosis-api.key}")
