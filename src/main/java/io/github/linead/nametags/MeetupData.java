@@ -3,6 +3,8 @@ package io.github.linead.nametags;
 import io.github.linead.nametags.domain.Event;
 import io.github.linead.nametags.domain.Members;
 import io.github.linead.nametags.domain.Rsvps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,6 +21,7 @@ import java.util.stream.Stream;
 
 @Component
 public class MeetupData {
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     Environment env;
@@ -46,6 +49,9 @@ public class MeetupData {
         Map<String, Object> params = new HashMap<>();
         params.put("key", getKey());
         params.put("meetup_url_path", getMeetupPath());
+
+        log.info("getNextMeetups() querying URL:" + EVENT_URL);
+
         ResponseEntity<Event[]> responseEntity = restTemplate.getForEntity(EVENT_URL, Event[].class, params);
         Event[] events = responseEntity.getBody();
 
@@ -58,6 +64,8 @@ public class MeetupData {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("event_id", eventId);
         params.put("key", getKey());
+
+        log.info("getRsvps() querying URL:" + RSVP_URL);
 
         ResponseEntity<Rsvps> responseEntity = restTemplate.getForEntity(RSVP_URL, Rsvps.class, params);
         Rsvps rsvps = responseEntity.getBody();
@@ -74,6 +82,7 @@ public class MeetupData {
         params.put("key", getKey());
         params.put("page", page);
 
+        log.info("getMembers() querying page " + page + " URL:" + MEMBERS_URL);
         ResponseEntity<Members> responseEntity = restTemplate.getForEntity(MEMBERS_URL, Members.class, params);
         Members members = responseEntity.getBody();
 
@@ -87,8 +96,9 @@ public class MeetupData {
 
         //read all pages
         while(!StringUtils.isEmpty(members.getMeta().getNext())) {
-            String nextUrl = members.getMeta().getNext();
             params.put("page", ++page);
+
+            log.info("getMembers() querying page " + page + " URL:" + MEMBERS_URL);
             responseEntity = restTemplate.getForEntity(MEMBERS_URL, Members.class, params);
             members = responseEntity.getBody();
 
@@ -118,6 +128,7 @@ public class MeetupData {
         params.put("event_id", eventId);
         params.put("key", getKey());
 
+        log.info("getHosts() querying URL:" + MEMBERS_URL);
         ResponseEntity<Members.Member[]> responseEntity = restTemplate.getForEntity(HOSTS_URL, Members.Member[].class, params);
 
         return Stream.of(responseEntity.getBody()).map(Members.Member::getId).collect(Collectors.toSet());
